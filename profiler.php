@@ -27,7 +27,7 @@ class Profiler {
 		self::$checkpoints[] = array(
 			'name'   => $name,
 			'marked' => $now,
-			'timing' => number_format($timePassedFromLastCheckpoint, 4) . ' ms'
+			'timing' => number_format($timePassedFromLastCheckpoint, 4)
 		);
 	}
 
@@ -35,13 +35,13 @@ class Profiler {
 		$now = self::getTime();
 
 		if ($started) {
-			$timing = $started - $now;
+			$timing = $now - $started;
 		}
 
 		self::$queries[] = array(
-			'query'  => $query,
+			'query'  => trim($query),
 			'marked' => $now,
-			'timing' => ($started === NULL ? 'unknown' : number_format($timing, 4) . ' ms')
+			'timing' => ($started === NULL ? 'unknown' : number_format($timing, 4))
 		);
 	}
 
@@ -72,13 +72,19 @@ class Profiler {
 
 		$_checkpoints = array();
 		foreach (self::$checkpoints as $_mark) {
-			$_checkpoints[] = $_mark['timing'] . ' -> ' .  $_mark['name'];
+			$_checkpoints[] = $_mark['timing'] . ' ms -> ' .  $_mark['name'];
 		}
+
+		$mem_usage = memory_get_peak_usage(); // bytes
+		if ($mem_usage < 1024) $mem_usage .= 'b';
+		else if ($mem_usage < 1024 * 1024) $mem_usage = round($mem_usage / 1024) . 'k';
+		else if ($mem_usage < 1024 * 1024 * 1024) $mem_usage = round($mem_usage / (1024 * 1024)) . 'm';
 
 		return array(
 			'total_script_execution_time' => $total_timing,
+			'total_memory_usage'          => $mem_usage,
 			'checkpoint_report'           => $_checkpoints,
-//			'checkpoints'                 => self::$checkpoints,
+			'checkpoints'                 => self::$checkpoints,
 			'queries'                     => self::$queries,
 		);
 	}
