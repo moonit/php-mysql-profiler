@@ -4,6 +4,7 @@ class Profiler {
 
 	static $instance;
 	static $checkpoints;
+	static $queries;
 	static $lastCheckpointTime;
 
 	static function getTime(){
@@ -27,6 +28,20 @@ class Profiler {
 			'name'   => $name,
 			'marked' => $now,
 			'timing' => number_format($timePassedFromLastCheckpoint, 4) . ' ms'
+		);
+	}
+
+	static function log_query($query, $started = NULL){
+		$now = self::getTime();
+
+		if ($started) {
+			$timing = $started - $now;
+		}
+
+		self::$queries[] = array(
+			'query'  => $query,
+			'marked' => $now,
+			'timing' => ($started === NULL ? 'unknown' : number_format($timing, 4) . ' ms')
 		);
 	}
 
@@ -63,7 +78,8 @@ class Profiler {
 		return array(
 			'total_script_execution_time' => $total_timing,
 			'checkpoint_report'           => $_checkpoints,
-			//'checkpoints' => self::$checkpoints,
+//			'checkpoints'                 => self::$checkpoints,
+			'queries'                     => self::$queries,
 		);
 	}
 
