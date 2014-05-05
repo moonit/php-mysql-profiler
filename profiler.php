@@ -31,7 +31,7 @@ class Profiler {
 		);
 	}
 
-	static function log_query($query, $started = NULL){
+	static function log_query($query, $started = NULL, $server = NULL){
 		$now = self::getTime();
 
 		if ($started) {
@@ -41,7 +41,8 @@ class Profiler {
 		self::$queries[] = array(
 			'query'  => trim($query),
 			'marked' => $now,
-			'timing' => ($started === NULL ? 'unknown' : number_format($timing, 4))
+			'timing' => ($started === NULL ? 'unknown' : number_format($timing, 4)),
+			'server' => $server
 		);
 	}
 
